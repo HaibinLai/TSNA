@@ -57,7 +57,7 @@ def ntlm_hash_func(password):
 
 
 def connection_establish(ip_p):
-    """
+    """ Connect the host with IP:Port
     Task 1.1 Correctly separate the IP address from the port number in the string
     Returns the socket object of the connected server when the socket server address pointed to by IP:port is available
     Otherwise, an error message is given
@@ -65,7 +65,20 @@ def connection_establish(ip_p):
     :return socket_client: socket.socket() or None
     :return information: str 'success' or error information
     """
-    # TODO: finish the codes
+    # Done: finish the codes
+    try:
+        server_ip, server_port = ip_p.split(':')
+        if int(server_port) > 65536 or int(server_port) <= 0:
+            print("Invalid IP Port")
+            return None, ValueError
+    except ValueError:
+        print("Invalid IP")
+        return None, ValueError
+    socket_client = socket.socket()
+    socket_client.connect((str(server_ip), int(server_port)))
+    info = socket_client.recv(1024)
+    # socket_client.send("hello".encode('utf-8'))
+    return socket_client, info
     
 
 def load_users(user_records_txt):
@@ -74,7 +87,22 @@ def load_users(user_records_txt):
     :param user_records_txt: a txt file containing username and password records
     :return users: dict {'username':'password'}
     """
-    # TODO: finish the codes
+    # Done: finish the codes
+    users = {}  # Initialize
+
+    if not os.path.exists(user_records_txt):
+        file = open(user_records_txt, 'w')
+        file.close()
+
+    with open(user_records_txt, 'r') as user_r:
+        for line in user_r:
+            line = line.strip()
+            if line:  # Ensure the line is not empty
+                username, password = line.split(':', 1)  # Split
+                users[username] = password  # Store
+
+    return users
+
 
 
 def user_register(cmd, users):
