@@ -76,7 +76,7 @@ def connection_establish(ip_p):
         return None, ValueError
     socket_client = socket.socket()
     socket_client.connect((str(server_ip), int(server_port)))
-    info = socket_client.recv(1024)
+    info = socket_client.recv(1024).decode('utf-8')
     # socket_client.send("hello".encode('utf-8'))
     return socket_client, info
     
@@ -113,6 +113,17 @@ def user_register(cmd, users):
     :return feedback message: str
     """
     # TODO: finish the codes
+    new_username = cmd[1]
+    new_password = cmd[2]
+    if new_username in users:
+        print("Username is already in users!")
+        return "Username is already in users!"
+    users[new_username] = new_password
+    with open(user_inf_txt, 'w') as user_r:
+        user_r.write(new_username+":"+new_password+"\n")
+
+    return "Your Registered Username is " + new_username
+
 
 
 def login_authentication(conn, cmd, users):
@@ -137,7 +148,13 @@ def server_message_encrypt(message):
     :return encrypted message: str, encrypted password: str
     """
     # TODO: finish the codes
-    
+    if message == "login":
+        print("Username")
+        username = input()
+        encrypted_message = ntlm_hash_func(input())
+        return username, encrypted_message
+    else:
+        return message, None
 
 def generate_challenge():
     """
@@ -159,15 +176,18 @@ def calculate_response(ntlm_hash, challenge):
 
 def server_response(server, password_hash):
     """
-    Task 3.4 Receives the server response and determines whether the message returned by the server is an authentication challenge.
-    If it is, the challenge will be authenticated with the encrypted password, and the authentication information will be returned to the server to obtain the login result
+    Task 3.4 Receives the server response and determines whether the message
+    returned by the server is an authentication challenge.
+    If it is, the challenge will be authenticated with the encrypted password,
+     and the authentication information will be returned to the server to obtain the login result
     Otherwise, the original message is returned
     :param server: socket server
     :param password_hash: encrypted password
     :return server response: str
     """
     # TODO: finish the codes
-
+    message = server.recv(1024)
+    return message
 
 def login_cmds(receive_data, users, login_user):
     """

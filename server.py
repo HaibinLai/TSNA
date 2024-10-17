@@ -29,13 +29,21 @@ def main_loop(socket_conn: socket, client_address, login_user):
     """
     ## Task 1.3
     # TODO: finish the codes
+
     receive_data = ''
-    receive_data = socket_conn.recv(1024)
+    try:
+        receive_data = socket_conn.recv(1024).decode('utf-8')
+    except ConnectionAbortedError:
+        print("Connection aborted from "+client_address)
+        return False, None
+
     print("Received data:", receive_data, " from ", client_address)
     data_log = str(client_address)
-    with open(data_log, 'a') as file:
-        file.write(str(receive_data))
-        # file.write(str(time.localtime()))
+    with open("data_log.txt", 'a') as file:
+        file.write(data_log+",")
+        file.write(str(receive_data)+",")
+        file.write(str(time.time()))
+        file.write("\n")
     file.close()
     ## Task 1.3
 
