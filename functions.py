@@ -112,17 +112,17 @@ def user_register(cmd, users):
     :param users: The dict to hold information about all users
     :return feedback message: str
     """
-    # TODO: finish the codes
+    # done: finish the codes
     new_username = cmd[1]
     new_password = cmd[2]
     if new_username in users:
         print("Username is already in users!")
-        return "Username is already in users!"
+        return FAILURE("Username is already in users!")
     users[new_username] = new_password
     with open(user_inf_txt, 'w') as user_r:
         user_r.write(new_username+":"+new_password+"\n")
 
-    return "Your Registered Username is " + new_username
+    return SUCCESS("Your Registered Username is " + new_username)
 
 
 
@@ -137,9 +137,19 @@ def login_authentication(conn, cmd, users):
     :return: feedback message: str, login_user: str
     """
     # TODO: finish the codes
+    login_user = cmd[1]
+    login_password = cmd[2]
+    if login_user in users:
+        if users[login_user] == login_password:
+            print("Logged in successfully!")
+            return SUCCESS("login is successful"), login_user
+        else:
+            return FAILURE("Wrong password!"), None
+    else:
+        return FAILURE("The user does not exist!"), None
 
 
-def server_message_encrypt(message):
+def server_message_encrypt(message: str):
     """
     Task 3.1 Determine whether the command is "login", "register", or "changepwd",
     If so, it encrypts the password in the command and returns the encrypted message and Password
@@ -147,14 +157,16 @@ def server_message_encrypt(message):
     :param message: str message sent to server:
     :return encrypted message: str, encrypted password: str
     """
-    # TODO: finish the codes
-    if message == "login":
-        print("Username")
-        username = input()
-        encrypted_message = ntlm_hash_func(input())
-        return username, encrypted_message
+    # done: finish the codes
+    code = message.split(" ")
+    if (code[0] == "login" or code[0] == "register" or code[0] == "changepwd") and len(code) == 3:
+        print(code[0]+"ing")
+        username = code[1]
+        encrypted_message = ntlm_hash_func(code[2])
+        return code[0]+" "+username+" "+encrypted_message, encrypted_message
     else:
         return message, None
+
 
 def generate_challenge():
     """
@@ -162,9 +174,12 @@ def generate_challenge():
     :return information: bytes random bytes as challenge message
     """
     # TODO: finish the codes
+    random_bytes = os.urandom(8)
+    print("Random bytes for challenge: ", random_bytes)
+    return random_bytes
 
 
-def calculate_response(ntlm_hash, challenge):
+def calculate_response(ntlm_hash: str, challenge: bytes):
     """
     Task 3.3
     :param ntlm_hash: str encrypted password
@@ -172,6 +187,8 @@ def calculate_response(ntlm_hash, challenge):
     :return expected response
     """
     # TODO: finish the codes
+    return hmac.new(bytes(ntlm_hash), msg=bytes(challenge), digestmod=hashlib.sha256)
+
     
 
 def server_response(server, password_hash):
@@ -180,13 +197,18 @@ def server_response(server, password_hash):
     returned by the server is an authentication challenge.
     If it is, the challenge will be authenticated with the encrypted password,
      and the authentication information will be returned to the server to obtain the login result
+
     Otherwise, the original message is returned
     :param server: socket server
     :param password_hash: encrypted password
     :return server response: str
     """
     # TODO: finish the codes
-    message = server.recv(1024)
+    message = server.recv(1024).decode('utf-8')
+    if len(message) == 8:
+        cal_response = calculate_response(password_hash, bytes(message))
+        return cal_response
+
     return message
 
 def login_cmds(receive_data, users, login_user):
