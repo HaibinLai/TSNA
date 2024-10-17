@@ -3,4 +3,5 @@
 ## Student ID: 12211612
 
 ![img.png](png/Telnet.png)
+
 A figure showing how Telnet works on Client/Server
