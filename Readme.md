@@ -10,3 +10,5 @@ Telnet is a network protocol primarily used to establish text-based, bidirection
 ![img.png](png/Telnet.png)
 
 A figure showing how Telnet works on Client/Server
+
+Li, Y., Chard, R., Babuji, Y., Chard, K., Foster, I., & Li, Z. (2024). UniFaaS: Programming across distributed cyberinfrastructure with federated function serving (arXiv:2403.19257). https://arxiv.org/abs/2403.19257
