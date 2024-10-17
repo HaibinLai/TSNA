@@ -227,7 +227,20 @@ def server_response(server, password_hash):
 
     return message
 
-def login_cmds(receive_data, users, login_user):
+
+commands_login = [
+    '?',
+    'help',
+    'exit',
+    'logout',
+    'changepwd',
+    'sum',
+    'multiply',
+    'subtract',
+    'divide'
+]
+
+def login_cmds(receive_data: str, users, login_user):
     """
     Task 4 Command processing after login
     :param receive_data: Received user commands
@@ -235,5 +248,72 @@ def login_cmds(receive_data, users, login_user):
     :param login_user: The logged-in user
     :return feedback message: str, login user: str
     """
-    # TODO: finish the codes
-    
+    # done: finish the codes
+    msg = receive_data.split()
+    if msg[0] == 'exit':
+        if len(msg) == 1:
+            return SUCCESS("disconnected"), login_user
+        else:
+            return FAILURE("What are you doing?"), login_user
+    elif msg[0] == 'logout':
+        print("Logging out")
+        return SUCCESS("Logout from current user: " + login_user), None
+    elif msg[0] == 'changepwd':
+        print("Trying to change password")
+        if len(msg) != 2:
+            return FAILURE("Invalid password, please don't contain blank on password"), login_user
+        new_pwd = msg[1]
+        users[login_user] = new_pwd
+        return SUCCESS("Successfully changed password"), login_user
+
+    elif msg[0] == 'login':
+        print("try to login at the same time!")
+        return FAILURE("You have logged in "+login_user+", please logout before you want to change to other user"), login_user
+
+
+    if msg[0] == 'sum':
+        try:
+            numbers = [int(num) for num in msg[1:]]
+        except ValueError:
+            return FAILURE("Please enter Valid number!"), login_user
+        sum = 0
+        for num in numbers:
+            sum += num
+
+        return SUCCESS(str(sum)), login_user
+    elif msg[0] == 'multiply':
+        try:
+            numbers = [int(num) for num in msg[1:]]
+        except ValueError:
+            return FAILURE("Please enter Valid number!"), login_user
+        ans = 0
+        for num in numbers:
+            ans = ans * num
+        return SUCCESS(str(ans)), login_user
+    elif msg[0] == 'subtract':
+        if len(msg) != 3:
+            return FAILURE("Please enter Valid number! subtract $(number1) $(number2) "), login_user
+        try:
+            numbers = [int(num) for num in msg[1:]]
+        except ValueError:
+            return FAILURE("Please enter Valid number!"), login_user
+        ans = numbers[0] - numbers[1]
+        return SUCCESS(str(ans)), login_user
+    elif msg[0] == 'divide':
+        if len(msg) != 3:
+            return FAILURE("Please enter Valid number! divide $(number1) $(number2) "), login_user
+        try:
+            numbers = [int(num) for num in msg[1:]]
+        except ValueError:
+            return FAILURE("Please enter Valid number!"), login_user
+        if numbers[1] == 0:
+            return FAILURE("The dividend cannot be zero!"), login_user
+
+        ans = numbers[0] / numbers[1]
+        return SUCCESS(str(ans)), login_user
+    elif msg[0] == '?' or msg[0] == 'help' or msg[0] == 'ls':
+        feedback_data = 'Available commends: \n\t' + '\n\t'.join(commands_login)
+        return SUCCESS(feedback_data), login_user
+    else:
+        return FAILURE("Invalid command!"), login_user
+

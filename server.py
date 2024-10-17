@@ -40,10 +40,7 @@ def main_loop(socket_conn: socket, client_address, login_user):
     print("Received data:", receive_data, " from ", client_address)
     data_log = str(client_address)
     with open("data_log.txt", 'a') as file:
-        file.write(data_log+",")
-        file.write(str(receive_data)+",")
-        file.write(str(time.time()))
-        file.write("\n")
+        file.write(data_log+","+str(receive_data)+","+str(time.time())+"\n")
     file.close()
     ## Task 1.3
 
@@ -92,7 +89,7 @@ def main_loop(socket_conn: socket, client_address, login_user):
     try:
         socket_conn.sendall(feedback_data.encode('UTF-8'))
         if feedback_data == '200:disconnected':
-                return False, None
+            return False, None
     except ConnectionResetError:
         print("close connection with", client_address)
         socket_conn.close()
