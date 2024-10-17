@@ -104,7 +104,6 @@ def load_users(user_records_txt):
     return users
 
 
-
 def user_register(cmd, users):
     """
     Task 2.2 Register command processing
@@ -119,7 +118,7 @@ def user_register(cmd, users):
         print("Username is already in users!")
         return FAILURE("Username is already in users!")
     users[new_username] = new_password
-    with open(user_inf_txt, 'w') as user_r:
+    with open(user_inf_txt, 'a') as user_r:
         user_r.write(new_username+":"+new_password+"\n")
 
     return SUCCESS("Your Registered Username is " + new_username)
@@ -141,8 +140,17 @@ def login_authentication(conn, cmd, users):
     login_password = cmd[2]
     if login_user in users:
         if users[login_user] == login_password:
-            print("Logged in successfully!")
-            return SUCCESS("login is successful"), login_user
+            challenge = generate_challenge()
+            conn.send(challenge)
+
+            calcu = conn.recv(1024)
+            ans = calculate_response(login_password, challenge)
+            if ans == calcu:
+                print("Logged in successfully!")
+                return SUCCESS("login is successful"), login_user
+            else:
+                print("Authentication Failed!")
+                return FAILURE("Authentication Failed!"), None
         else:
             return FAILURE("Wrong password!"), None
     else:
@@ -187,9 +195,14 @@ def calculate_response(ntlm_hash: str, challenge: bytes):
     :return expected response
     """
     # TODO: finish the codes
-    return hmac.new(bytes(ntlm_hash), msg=bytes(challenge), digestmod=hashlib.sha256)
+    # 假设 ntlm_hash 是一个字符串，使用 utf-8 编码转换为字节
+    ntlm_hash_bytes = ntlm_hash.encode('utf-8') if isinstance(ntlm_hash, str) else bytes(ntlm_hash)
 
-    
+    # 假设 challenge 是字节串，直接使用
+    # 如果 challenge 也是字符串，需要转换为字节
+    challenge_bytes = challenge if isinstance(challenge, bytes) else challenge.encode('utf-8')
+    return hmac.new(ntlm_hash_bytes, msg=challenge_bytes, digestmod=hashlib.sha256).digest()
+
 
 def server_response(server, password_hash):
     """
@@ -204,10 +217,13 @@ def server_response(server, password_hash):
     :return server response: str
     """
     # TODO: finish the codes
-    message = server.recv(1024).decode('utf-8')
+    message = server.recv(1024)
     if len(message) == 8:
+        print('Server challenge')
         cal_response = calculate_response(password_hash, bytes(message))
-        return cal_response
+        server.sendall(cal_response)
+        calcu = server.recv(1024)
+        return calcu
 
     return message
 
