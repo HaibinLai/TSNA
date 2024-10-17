@@ -103,8 +103,6 @@ def main_loop(socket_conn: socket, client_address, login_user):
 # TODO: finish the codes
 ## Task 1.2
 # https://docs.python.org/zh-cn/3.10/library/socketserver.html
-
-
 class TSNAServerHandler(socketserver.BaseRequestHandler):
     def handle(self):
         print('Got connection from', self.client_address)
