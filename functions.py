@@ -7,9 +7,10 @@ import random
 import ast
 import fileinput
 
-host = "localhost"
+host = "10.16.83.128"
 port = 6016
 user_inf_txt = 'users.txt'
+
 
 login_commands = [
     '?',
