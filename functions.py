@@ -7,7 +7,7 @@ import random
 import ast
 import fileinput
 
-host = "10.16.83.128"
+host = "localhost"
 port = 6016
 user_inf_txt = 'users.txt'
 
@@ -125,7 +125,6 @@ def user_register(cmd, users):
     return SUCCESS("Your Registered Username is " + new_username)
 
 
-
 def login_authentication(conn, cmd, users):
     """
     Task 2.3 Login authentication
@@ -136,7 +135,7 @@ def login_authentication(conn, cmd, users):
     :param users: The dict to hold information about all users
     :return: feedback message: str, login_user: str
     """
-    # TODO: finish the codes
+    # done: finish the codes
     login_user = cmd[1]
     login_password = cmd[2]
     if login_user in users:
@@ -182,7 +181,7 @@ def generate_challenge():
     Task 3.2
     :return information: bytes random bytes as challenge message
     """
-    # TODO: finish the codes
+    # done: finish the codes
     random_bytes = os.urandom(8)
     print("Random bytes for challenge: ", random_bytes)
     return random_bytes
@@ -195,7 +194,7 @@ def calculate_response(ntlm_hash: str, challenge: bytes):
     :param challenge: bytes random bytes as challenge message
     :return expected response
     """
-    # TODO: finish the codes
+    # done: finish the codes
     # 假设 ntlm_hash 是一个字符串，使用 utf-8 编码转换为字节
     ntlm_hash_bytes = ntlm_hash.encode('utf-8') if isinstance(ntlm_hash, str) else bytes(ntlm_hash)
 
@@ -217,7 +216,7 @@ def server_response(server, password_hash):
     :param password_hash: encrypted password
     :return server response: str
     """
-    # TODO: finish the codes
+    # done: finish the codes
     message = server.recv(1024)
     if len(message) == 8:
         print('Server challenge')
@@ -229,17 +228,17 @@ def server_response(server, password_hash):
     return message
 
 
-commands_login = [
-    '?',
-    'help',
-    'exit',
-    'logout',
-    'changepwd',
-    'sum',
-    'multiply',
-    'subtract',
-    'divide'
-]
+# commands_login = [
+#     '?',
+#     'help',
+#     'exit',
+#     'logout',
+#     'changepwd',
+#     'sum',
+#     'multiply',
+#     'subtract',
+#     'divide'
+# ]
 
 def login_cmds(receive_data: str, users, login_user):
     """
@@ -313,7 +312,7 @@ def login_cmds(receive_data: str, users, login_user):
         ans = numbers[0] / numbers[1]
         return SUCCESS(str(ans)), login_user
     elif msg[0] == '?' or msg[0] == 'help' or msg[0] == 'ls':
-        feedback_data = 'Available commends: \n\t' + '\n\t'.join(commands_login)
+        feedback_data = 'Available commends: \n\t' + '\n\t'.join(login_commands)
         return SUCCESS(feedback_data), login_user
     else:
         return FAILURE("Invalid command!"), login_user
