@@ -228,18 +228,6 @@ def server_response(server, password_hash):
     return message
 
 
-# commands_login = [
-#     '?',
-#     'help',
-#     'exit',
-#     'logout',
-#     'changepwd',
-#     'sum',
-#     'multiply',
-#     'subtract',
-#     'divide'
-# ]
-
 def login_cmds(receive_data: str, users, login_user):
     """
     Task 4 Command processing after login
@@ -269,7 +257,6 @@ def login_cmds(receive_data: str, users, login_user):
     elif msg[0] == 'login':
         print("try to login at the same time!")
         return FAILURE("You have logged in "+login_user+", please logout before you want to change to other user"), login_user
-
 
     if msg[0] == 'sum':
         try:
