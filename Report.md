@@ -23,8 +23,8 @@
 Telnet is a network protocol primarily used to establish text-based, bidirectional communication
  between a local computer and a remote server. It operates over a TCP/IP connection, allowing users to remotely control servers via command-line interface. Telnet is often used to manage devices, servers, or network equipment, but due to its lack of encryption, it poses security risks and has largely been replaced by encrypted protocols like SSH.
 
- ![Pasted image 20241109231955.png](Pasted%20image%2020241109231955.png)
 
+![Pasted image 20241109231955.png](png%2FPasted%20image%2020241109231955.png)
 
 A figure showing how Telnet works on Client/Server
 
@@ -72,13 +72,13 @@ class TSNAServerHandler(socketserver.BaseRequestHandler):
 
 Now the client can be able to send a ip:port to establish a TCP connection.
 
-![Pasted image 20241109232509.png](Pasted%20image%2020241109232509.png)
+![Pasted image 20241109232509.png](png%2FPasted%20image%2020241109232509.png)
 
 Next, on the `main_loop`, it will handle recv data and save it into `data_log.txt`.
 
-![Pasted image 20241109232907.png](Pasted%20image%2020241109232907.png)
+![Pasted image 20241109232907.png](png%2FPasted%20image%2020241109232907.png)
 
-![Pasted image 20241109232957.png](Pasted%20image%2020241109232957.png)
+![Pasted image 20241109232957.png](png%2FPasted%20image%2020241109232957.png)
 
 
 
@@ -128,29 +128,29 @@ def user_register(cmd, users):
 
 And it will be registered in server.
 
-![Pasted image 20241109233319.png](Pasted%20image%2020241109233319.png)
+![Pasted image 20241109233319.png](png%2FPasted%20image%2020241109233319.png)
 
 
 Both the data log and user file will not record the password in **plaintext** . Instead, they will be recorded as **Ciphertext**.
 
-![Pasted image 20241109233444.png](Pasted%20image%2020241109233444.png)
+![Pasted image 20241109233444.png](png%2FPasted%20image%2020241109233444.png)
 
 Now the user can login to its record.
 
-![Pasted image 20241109233717.png](Pasted%20image%2020241109233717.png)
+![Pasted image 20241109233717.png](png%2FPasted%20image%2020241109233717.png)
 
 The server side shows the logging procedure. We will explain this logs on NTLM Authentication.
 
-![Pasted image 20241109233735.png](Pasted%20image%2020241109233735.png)
+![Pasted image 20241109233735.png](png%2FPasted%20image%2020241109233735.png)
 
 
 ## Task 3: NTLM Authentication
 
 The procedure of NTLM authenrication as the assignment request is shown as following figure.
 
-![Pasted image 20241109235959.png](Pasted%20image%2020241109235959.png)
+![Pasted image 20241109235959.png](png%2FPasted%20image%2020241109235959.png)
 
-![Pasted image 20241110001526.png](Pasted%20image%2020241110001526.png)
+![Pasted image 20241110001526.png](png%2FPasted%20image%2020241110001526.png)
 
 So, when first send the message, password will be encrypted in function `ntlm_hash_func` .
 
@@ -176,7 +176,7 @@ As the wireshark shows, it contains `user_name` HaibinLai in plain context and e
 
 
 Then, the server will determine if the password in MD5 are the same in Database MD5:
-![Pasted image 20241110002232.png](Pasted%20image%2020241110002232.png)
+![Pasted image 20241110002232.png](png%2FPasted%20image%2020241110002232.png)
 ```python
 def login_authentication(conn, cmd, users):  
     login_user = cmd[1]  
@@ -213,15 +213,15 @@ def generate_challenge():
 
 Here we find the 8 byte: `9c 0c 24 a6 ca af 4c 59` . (Here `\xafLY` means `4c 59` are `LY` in `ASCII`) . As for X11 in Wireshark, it's because it's it default detecting protocol.
 
-![Pasted image 20241110002929.png](Pasted%20image%2020241110002929.png)
-![Pasted image 20241110004520.png](Pasted%20image%2020241110004520.png)
-![Pasted image 20241110004315.png](Pasted%20image%2020241110004315.png)
+![Pasted image 20241110002929.png](png%2FPasted%20image%2020241110002929.png)
+![Pasted image 20241110004520.png](png%2FPasted%20image%2020241110004520.png)
+![Pasted image 20241110004315.png](png%2FPasted%20image%2020241110004315.png)
 
 
 
 After getting 8 byte challenge, both client and server encrypted with  `HMAC-SHA256`.
 
-![Pasted image 20241110002305.png](Pasted%20image%2020241110002305.png)
+![Pasted image 20241110002305.png](png%2FPasted%20image%2020241110002305.png)
 
 ```python
 def calculate_response(ntlm_hash: str, challenge: bytes):  
@@ -237,11 +237,11 @@ def calculate_response(ntlm_hash: str, challenge: bytes):
 
 Then the encrypted code in client side will send to Server to check whether it pass the challenge.
 
-![Pasted image 20241110002726.png](Pasted%20image%2020241110002726.png)
-![Pasted image 20241110002503.png](Pasted%20image%2020241110002503.png)
+![Pasted image 20241110002726.png](png%2FPasted%20image%2020241110002726.png)
+![Pasted image 20241110002503.png](png%2FPasted%20image%2020241110002503.png)
 
 If success, it will login.
-![Pasted image 20241110002750.png](Pasted%20image%2020241110002750.png)
+![Pasted image 20241110002750.png](png%2FPasted%20image%2020241110002750.png)
 
 
 
