@@ -249,5 +249,135 @@ If success, it will login.
 ### Task 4: Command Processing
 
 
+`sum $(num1) $(num2) ...`
+note that it's limited to `float` format.
+
+![[Pasted image 20241110010548.png]]
+
+`multiply $(num1) $(num2) ...`
+![[Pasted image 20241110010706.png]]
+
+`sub $(num1) $(num2)`
+
+`subtract $(num1) $(num2)`
+
+![[Pasted image 20241110011753.png]]
+
+#### login logout help, changepwd
+![[Pasted image 20241110013112.png]]
+
+## Exception
+
+
+### 1. TCP Connection
+
+#### IP Address
+**Not Allowed IP** : 
+1. not in 32bits.(`inet_aton` convert an IP address in string format (123.45.67.89) to the 32-bit packed binary format used in low-level network functions.
+`Invalid IP Port: ", server_port`
+
+2. 0.0.0.0: it represents "all network interfaces" or "local address" but cannot be used to connect to a remote host.
+`Invalid IP for 0.0.0.0, it represent all network interfaces.`
+
+3. Invalid ip without correct form of "ip:port"
+`Invalid IP and port format. Please use ip:port with ipv4 form: ", ip_p`
+
+**Special Allowed IP**:
+1. localhost
+
+
+#### Connection Refused
+`Connection fail!`
+
+---
+
+### NTLM and User Authentication
+#### Register an already registered user
+return `FAILURE("Username is already in users!")`
+```python
+# Attempt to register a user that is already registered  
+if new_username in users:  
+    print("Username is already in users!")  
+    return FAILURE("Username is already in users!")
+```
+
+Success case:
+`SUCCESS("Your Registered Username is " + new_username)`
+
+
+#### Login parameter less than 2
+`FAILURE(Please re-enter the login command with your username and password)`
+
+#### Login parameter more than 2
+`FAILURE(Password shouldn't include spaces)`
+
+#### Register parameter less than 2
+`FAILURE(Please re-enter the command with username and password)`
+
+#### Register parameterMore than 3
+`FAILURE(Username or password shouldn't include spaces)`
+
+
+#### Login after being logged in
+`FAILURE("You have logged in "+login_user+", please logout before you want to change to other user")`, login_user
+```python
+elif msg[0] == 'login':  
+    print("try to login at the same time!")  
+    return FAILURE("You have logged in "+login_user+", please logout before you want to change to other user"), login_user
+```
+
+#### Register when logged in
+return `FAILURE("The register command can only be done when not logging!")`, login_user
+
+#### The user don't exist while log in
+`FAILURE("The user does not exist!")`
+
+#### The user's MD5 encrypt password doesn't match with DB log
+`FAILURE("Wrong password!")`
+
+#### Challenge failed
+`FAILURE("Authentication Failed!")`
+
+
+#### Register, changepwd, login with blanks
+`Error on format!`
+`FAILURE("Invalid password, please don't contain blank on password")`
+
+
+#### Same Password
+`FAILURE("Same password, please don't take same password!")`
+
+---
+
+### Telnet Service
+#### More number in sub and divide
+`return FAILURE("Please enter Valid number! subtract $(number1) $(number2) "), login_user`
+`return FAILURE("Please enter Valid number! divide $(number1) $(number2) "), login_user`
+
+#### Divide 0
+return `FAILURE("The dividend cannot be zero!")`, login_user
+
+
+#### Input NAN
+`FAILURE("Please enter Valid number!")`
+
+---
+
+### Others
+#### Exit with more parameters
+return `FAILURE("What are you doing?")`, login_user
+
+for example:
+```
+exit 1 DROP TABLE ALL
+```
+
+
+#### Disconnect
+`200:disconnected`
+
+
+
+
 
 Li, Y., Chard, R., Babuji, Y., Chard, K., Foster, I., & Li, Z. (2024). UniFaaS: Programming across distributed cyberinfrastructure with federated function serving (arXiv:2403.19257). https://arxiv.org/abs/2403.19257
