@@ -59,7 +59,7 @@ def main_loop(socket_conn: socket, client_address, login_user):
             # print(cmd)
             if cmd[0] == 'login':
                 if len(cmd) < 3:
-                    feedback_data = 'Please re-enter the login commend with your username and password'
+                    feedback_data = 'Please re-enter the login command with your username and password'
                     feedback_data = FAILURE(feedback_data)
                 elif len(cmd) == 3:
                     ## Task 2.3, 3.2, 3.5
