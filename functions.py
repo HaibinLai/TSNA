@@ -79,12 +79,17 @@ def connection_establish(ip_p):
         if not is_valid_ipv4_socket(server_ip) and server_ip != 'localhost':
             print("Invalid IP")
             return None, "Please try again"
+        if server_ip == '0.0.0.0':
+            print("Invalid IP for 0.0.0.0, it represent all network interfaces.")
 
     except ValueError:
         print("Invalid IP and port format. Please use ip:port with ipv4 form: ", ip_p)
         return None, "Please try again"
     socket_client = socket.socket()
-    socket_client.connect((str(server_ip), int(server_port)))
+    try:
+        socket_client.connect((str(server_ip), int(server_port)))
+    except ConnectionRefusedError:
+        print("Connection fail!")
     info = socket_client.recv(1024).decode('utf-8')
     # socket_client.send("hello".encode('utf-8'))
     return socket_client, info
@@ -186,10 +191,10 @@ def server_message_encrypt(message: str):
     # done: finish the codes
     code = message.split(" ")
 
-    if len(code) != 3:
+    if len(code) != 3 and code[0] != "changepwd":
         return message, None
 
-    if code[0] == "login" or code[0] == "register" or code[0] == "changepwd":
+    if code[0] == "login" or code[0] == "register":
         if len(code) == 3:
             print(code[0]+"ing")
             username = code[1]
@@ -198,6 +203,15 @@ def server_message_encrypt(message: str):
         else:
             print("Error on format!")
             return message, None
+    elif code[0] == "changepwd":
+        if len(code) == 2:
+            print(code[0] + "ing")
+            encrypted_message = ntlm_hash_func(code[1])
+            return code[0] + " " + encrypted_message, encrypted_message
+        else:
+            print("Error on format!")
+            return message, None
+
     else:
         return message, None
 
@@ -342,6 +356,7 @@ def login_cmds(receive_data: str, users, login_user):
             return FAILURE("The dividend cannot be zero!"), login_user
         ans = numbers[0] / numbers[1]
         return SUCCESS(str(ans)), login_user
+
     elif msg[0] == '?' or msg[0] == 'help' or msg[0] == 'ls':
         feedback_data = 'Available commands: \n\t' + '\n\t'.join(login_commands)
         return SUCCESS(feedback_data), login_user
