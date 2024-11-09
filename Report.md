@@ -236,11 +236,11 @@ def calculate_response(ntlm_hash: str, challenge: bytes):
 
 
 Then the encrypted code in client side will send to Server to check whether it pass the challenge.
+
 ![Pasted image 20241110002726.png](Pasted%20image%2020241110002726.png)
 ![Pasted image 20241110002503.png](Pasted%20image%2020241110002503.png)
 
 If success, it will login.
-
 ![Pasted image 20241110002750.png](Pasted%20image%2020241110002750.png)
 
 
