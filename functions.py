@@ -129,10 +129,6 @@ def user_register(cmd, users):
     :return feedback message: str
     """
     # done: finish the codes
-
-    # if len(cmd) != 3:
-    #     return FAILURE("Username and password are invalid. Please don't contain blanks in them!")
-
     new_username = cmd[1]
     new_password = cmd[2]
 
