@@ -69,17 +69,33 @@ def connection_establish(ip_p):
     # Done: finish the codes
     try:
         server_ip, server_port = ip_p.split(':')
+
+        # port test
         if int(server_port) > 65536 or int(server_port) <= 0:
-            print("Invalid IP Port")
-            return None, ValueError
+            print("Invalid IP Port: ", server_port)
+            return None, "Please try again"
+
+        # ip test
+        if not is_valid_ipv4_socket(server_ip) and server_ip != 'localhost':
+            print("Invalid IP")
+            return None, "Please try again"
+
     except ValueError:
-        print("Invalid IP")
-        return None, ValueError
+        print("Invalid IP and port format. Please use ip:port with ipv4 form: ", ip_p)
+        return None, "Please try again"
     socket_client = socket.socket()
     socket_client.connect((str(server_ip), int(server_port)))
     info = socket_client.recv(1024).decode('utf-8')
     # socket_client.send("hello".encode('utf-8'))
     return socket_client, info
+
+
+def is_valid_ipv4_socket(ip):
+    try:
+        socket.inet_aton(ip)
+        return True
+    except socket.error:
+        return False
     
 
 def load_users(user_records_txt):
@@ -113,8 +129,14 @@ def user_register(cmd, users):
     :return feedback message: str
     """
     # done: finish the codes
+
+    # if len(cmd) != 3:
+    #     return FAILURE("Username and password are invalid. Please don't contain blanks in them!")
+
     new_username = cmd[1]
     new_password = cmd[2]
+
+    # Attempt to register a user that is already registered
     if new_username in users:
         print("Username is already in users!")
         return FAILURE("Username is already in users!")
@@ -167,11 +189,19 @@ def server_message_encrypt(message: str):
     """
     # done: finish the codes
     code = message.split(" ")
-    if (code[0] == "login" or code[0] == "register" or code[0] == "changepwd") and len(code) == 3:
-        print(code[0]+"ing")
-        username = code[1]
-        encrypted_message = ntlm_hash_func(code[2])
-        return code[0]+" "+username+" "+encrypted_message, encrypted_message
+
+    if len(code) != 3:
+        return message, None
+
+    if code[0] == "login" or code[0] == "register" or code[0] == "changepwd":
+        if len(code) == 3:
+            print(code[0]+"ing")
+            username = code[1]
+            encrypted_message = ntlm_hash_func(code[2])
+            return code[0]+" "+username+" "+encrypted_message, encrypted_message
+        else:
+            print("Error on format!")
+            return message, None
     else:
         return message, None
 
@@ -196,6 +226,8 @@ def calculate_response(ntlm_hash: str, challenge: bytes):
     """
     # done: finish the codes
     # 假设 ntlm_hash 是一个字符串，使用 utf-8 编码转换为字节
+    # if ntlm_hash == None:
+
     ntlm_hash_bytes = ntlm_hash.encode('utf-8') if isinstance(ntlm_hash, str) else bytes(ntlm_hash)
 
     # 假设 challenge 是字节串，直接使用
@@ -218,12 +250,18 @@ def server_response(server, password_hash):
     """
     # done: finish the codes
     message = server.recv(1024)
+    # print(message)
+    # print(len(message))
     if len(message) == 8:
-        print('Server challenge')
-        cal_response = calculate_response(password_hash, bytes(message))
-        server.sendall(cal_response)
-        calcu = server.recv(1024)
-        return calcu
+        # for sum 1 2 3 4 5
+        if message.startswith(b'200:') or message.startswith(b'400:') :
+            return message
+        else:
+            print('Server challenge')
+            cal_response = calculate_response(password_hash, bytes(message))
+            server.sendall(cal_response)
+            calcu = server.recv(1024)
+            return calcu
 
     return message
 
@@ -237,20 +275,26 @@ def login_cmds(receive_data: str, users, login_user):
     :return feedback message: str, login user: str
     """
     # done: finish the codes
+
     msg = receive_data.split()
     if msg[0] == 'exit':
         if len(msg) == 1:
             return SUCCESS("disconnected"), login_user
         else:
             return FAILURE("What are you doing?"), login_user
+
     elif msg[0] == 'logout':
         print("Logging out")
         return SUCCESS("Logout from current user: " + login_user), None
+
     elif msg[0] == 'changepwd':
         print("Trying to change password")
         if len(msg) != 2:
             return FAILURE("Invalid password, please don't contain blank on password"), login_user
         new_pwd = msg[1]
+        old_pwd = users[login_user]
+        if new_pwd == old_pwd:
+            return FAILURE("Same password, please don't take same password!"), login_user
         users[login_user] = new_pwd
         return SUCCESS("Successfully changed password"), login_user
 
@@ -260,7 +304,8 @@ def login_cmds(receive_data: str, users, login_user):
 
     if msg[0] == 'sum':
         try:
-            numbers = [int(num) for num in msg[1:]]
+            numbers = [float(num) for num in msg[1:]]
+            # print(numbers)
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
         sum = 0
@@ -268,39 +313,46 @@ def login_cmds(receive_data: str, users, login_user):
             sum += num
 
         return SUCCESS(str(sum)), login_user
+
     elif msg[0] == 'multiply':
         try:
-            numbers = [int(num) for num in msg[1:]]
+            numbers = [float(num) for num in msg[1:]]
+            # print(numbers)
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
-        ans = 0
+        ans = 1
         for num in numbers:
             ans = ans * num
         return SUCCESS(str(ans)), login_user
-    elif msg[0] == 'subtract':
+
+    elif msg[0] == 'subtract' or msg[0] == 'sub':
         if len(msg) != 3:
             return FAILURE("Please enter Valid number! subtract $(number1) $(number2) "), login_user
         try:
-            numbers = [int(num) for num in msg[1:]]
+            numbers = [float(num) for num in msg[1:]]
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
         ans = numbers[0] - numbers[1]
         return SUCCESS(str(ans)), login_user
+
     elif msg[0] == 'divide':
         if len(msg) != 3:
             return FAILURE("Please enter Valid number! divide $(number1) $(number2) "), login_user
         try:
-            numbers = [int(num) for num in msg[1:]]
+            numbers = [float(num) for num in msg[1:]]
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
         if numbers[1] == 0:
             return FAILURE("The dividend cannot be zero!"), login_user
-
         ans = numbers[0] / numbers[1]
         return SUCCESS(str(ans)), login_user
     elif msg[0] == '?' or msg[0] == 'help' or msg[0] == 'ls':
-        feedback_data = 'Available commends: \n\t' + '\n\t'.join(login_commands)
+        feedback_data = 'Available commands: \n\t' + '\n\t'.join(login_commands)
         return SUCCESS(feedback_data), login_user
+
+    elif msg[0] == 'register':
+        return FAILURE("The register command can only be done when not logging!"), login_user
+
     else:
-        return FAILURE("Invalid command!"), login_user
+        return FAILURE("Invalid command! Please use help to show commands!"), login_user
 

@@ -56,6 +56,7 @@ def main_loop(socket_conn: socket, client_address, login_user):
         else:
             # Command processing with arguments
             cmd = receive_data.split(' ')
+            # print(cmd)
             if cmd[0] == 'login':
                 if len(cmd) < 3:
                     feedback_data = 'Please re-enter the login commend with your username and password'
