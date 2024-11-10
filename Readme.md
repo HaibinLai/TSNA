@@ -91,7 +91,9 @@ for example:
 ```
 exit 1 DROP TABLE ALL
 ```
-
+### Lack of input number
+        if len(msg) == 1:
+            return FAILURE("lack of number!"), login_user
 
 #### Disconnect
 `200:disconnected`
