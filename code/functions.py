@@ -6,6 +6,7 @@ import re
 import random
 import ast
 import fileinput
+import decimal
 
 host = "localhost"
 port = 6016
@@ -323,11 +324,18 @@ def login_cmds(receive_data: str, users, login_user):
             # print(numbers)
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
-        sum = 0
-        for num in numbers:
-            sum += num
 
-        return SUCCESS(str(sum)), login_user
+        try:
+            # 尝试将 msg 中的所有元素转换为 decimal.Decimal 类型
+            numbers = [decimal.Decimal(num) for num in msg[1:]]
+        except decimal.InvalidOperation:
+            # 如果转换失败，返回错误信息
+            return FAILURE("Please enter valid numbers!"), login_user
+        sum_ = 0
+        for num in numbers:
+            sum_ += num
+
+        return SUCCESS(str(sum_)), login_user
 
     elif msg[0] == 'multiply':
         if len(msg) == 1:
@@ -337,6 +345,14 @@ def login_cmds(receive_data: str, users, login_user):
             # print(numbers)
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
+
+        try:
+            # 尝试将 msg 中的所有元素转换为 decimal.Decimal 类型
+            numbers = [decimal.Decimal(num) for num in msg[1:]]
+        except decimal.InvalidOperation:
+            # 如果转换失败，返回错误信息
+            return FAILURE("Please enter valid numbers!"), login_user
+
         ans = 1
         for num in numbers:
             ans = ans * num
@@ -351,6 +367,14 @@ def login_cmds(receive_data: str, users, login_user):
             numbers = [float(num) for num in msg[1:]]
         except ValueError:
             return FAILURE("Please enter Valid number!"), login_user
+
+        try:
+            # 尝试将 msg 中的所有元素转换为 decimal.Decimal 类型
+            numbers = [decimal.Decimal(num) for num in msg[1:]]
+        except decimal.InvalidOperation:
+            # 如果转换失败，返回错误信息
+            return FAILURE("Please enter valid numbers!"), login_user
+
         ans = numbers[0] - numbers[1]
         return SUCCESS(str(ans)), login_user
 
@@ -365,6 +389,14 @@ def login_cmds(receive_data: str, users, login_user):
             return FAILURE("Please enter Valid number!"), login_user
         if numbers[1] == 0:
             return FAILURE("The dividend cannot be zero!"), login_user
+
+        try:
+            # 尝试将 msg 中的所有元素转换为 decimal.Decimal 类型
+            numbers = [decimal.Decimal(num) for num in msg[1:]]
+        except decimal.InvalidOperation:
+            # 如果转换失败，返回错误信息
+            return FAILURE("Please enter valid numbers!"), login_user
+
         ans = numbers[0] / numbers[1]
         return SUCCESS(str(ans)), login_user
 
