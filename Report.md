@@ -361,6 +361,10 @@ return `FAILURE("The dividend cannot be zero!")`, login_user
 #### Input NAN
 `FAILURE("Please enter Valid number!")`
 
+### Lack of input number
+        if len(msg) == 1:
+            return FAILURE("lack of number!"), login_user
+
 ---
 
 ### Others
