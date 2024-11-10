@@ -189,7 +189,7 @@ def server_message_encrypt(message: str):
     :return encrypted message: str, encrypted password: str
     """
     # done: finish the codes
-    code = message.split(" ")
+    code = message.split()
 
     if len(code) != 3 and code[0] != "changepwd":
         return message, None
@@ -294,8 +294,11 @@ def login_cmds(receive_data: str, users, login_user):
             return FAILURE("What are you doing?"), login_user
 
     elif msg[0] == 'logout':
-        print("Logging out")
-        return SUCCESS("Logout from current user: " + login_user), None
+        if len(msg) == 1:
+            print("Logging out")
+            return SUCCESS("Logout from current user: " + login_user), None
+        else:
+            return FAILURE("What are you doing?"), login_user
 
     elif msg[0] == 'changepwd':
         print("Trying to change password")
@@ -313,6 +316,8 @@ def login_cmds(receive_data: str, users, login_user):
         return FAILURE("You have logged in "+login_user+", please logout before you want to change to other user"), login_user
 
     if msg[0] == 'sum':
+        if len(msg) == 1:
+            return FAILURE("lack of number!"), login_user
         try:
             numbers = [float(num) for num in msg[1:]]
             # print(numbers)
@@ -325,6 +330,8 @@ def login_cmds(receive_data: str, users, login_user):
         return SUCCESS(str(sum)), login_user
 
     elif msg[0] == 'multiply':
+        if len(msg) == 1:
+            return FAILURE("lack of number!"), login_user
         try:
             numbers = [float(num) for num in msg[1:]]
             # print(numbers)
@@ -336,6 +343,8 @@ def login_cmds(receive_data: str, users, login_user):
         return SUCCESS(str(ans)), login_user
 
     elif msg[0] == 'subtract' or msg[0] == 'sub':
+        if len(msg) == 1:
+            return FAILURE("lack of number!"), login_user
         if len(msg) != 3:
             return FAILURE("Please enter Valid number! subtract $(number1) $(number2) "), login_user
         try:
@@ -346,6 +355,8 @@ def login_cmds(receive_data: str, users, login_user):
         return SUCCESS(str(ans)), login_user
 
     elif msg[0] == 'divide':
+        if len(msg) == 1:
+            return FAILURE("lack of number!"), login_user
         if len(msg) != 3:
             return FAILURE("Please enter Valid number! divide $(number1) $(number2) "), login_user
         try:
@@ -358,8 +369,11 @@ def login_cmds(receive_data: str, users, login_user):
         return SUCCESS(str(ans)), login_user
 
     elif msg[0] == '?' or msg[0] == 'help' or msg[0] == 'ls':
-        feedback_data = 'Available commands: \n\t' + '\n\t'.join(login_commands)
-        return SUCCESS(feedback_data), login_user
+        if len(msg) == 1:
+            feedback_data = 'Available commands: \n\t' + '\n\t'.join(login_commands)
+            return SUCCESS(feedback_data), login_user
+        else:
+            return FAILURE("What are you doing?"), login_user
 
     elif msg[0] == 'register':
         return FAILURE("The register command can only be done when not logging!"), login_user
